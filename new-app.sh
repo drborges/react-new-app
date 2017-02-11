@@ -3,6 +3,12 @@
 git init
 
 #
+# Creates project structure
+#
+mkdir -p app/{components,clients}
+mkdir -p test/{components,clients}
+
+#
 # Create default package.json file
 #
 echo '{
@@ -89,12 +95,6 @@ trim_trailing_whitespace = true
 [*.md]
 trim_trailing_whitespace = false
 ' > .editorconfig
-
-#
-# Creates project structure
-#
-mkdir -p app/{components,clients}
-mkdir -p test/{components,clients}
 
 #
 # Create a Github API client
