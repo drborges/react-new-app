@@ -16,7 +16,7 @@ echo '{
     "build": "./node_modules/webpack/bin/webpack.js --config webpack.config.js",
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
     "serve": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "spec": "mocha --require spec/spec.helper.js spec/**/*.spec.js"
+    "spec": "mocha --require test/spec.helper.js test/**/*.spec.js"
   }
 }
 ' > package.json
@@ -94,7 +94,7 @@ trim_trailing_whitespace = false
 # Creates project structure
 #
 mkdir -p app/{components,clients}
-mkdir -p spec/{components,clients}
+mkdir -p test/{components,clients}
 
 #
 # Create a Github API client
@@ -201,7 +201,7 @@ global.navigator = {
 }
 
 documentRef = document
-' > spec/spec.helper.js
+' > test/spec.helper.js
 
 #
 # Create spec example file
@@ -219,4 +219,4 @@ describe("A suite", () => {
     expect(wrapper).to.contain("reactjs")
   })
 })
-' > spec/components/Repo.spec.js
+' > test/components/Repo.spec.js
