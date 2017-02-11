@@ -5,5 +5,6 @@ Simple bootstrap script for creating a ReactJS app with babel, webpack, and all 
 # Usage
 
 ```
-curl -L http://bit.ly/new-react-app | bash
+$ mkdir my-app && cd my-app
+$ curl -L http://bit.ly/new-react-app | bash
 ```
