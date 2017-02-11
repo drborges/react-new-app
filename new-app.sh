@@ -15,7 +15,8 @@ echo '{
   "scripts": {
     "build": "./node_modules/webpack/bin/webpack.js --config webpack.config.js",
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
-    "serve": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js"
+    "serve": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "spec": "mocha --require spec/spec.helper.js spec/**/*.spec.js"
   }
 }
 ' > package.json
@@ -25,7 +26,11 @@ echo '{
 #
 brew install yarn || true
 yarn add react react-dom
-yarn add --dev babel-cli babel-preset-env babel-preset-react babel-polyfill babel-loader babel-core webpack webpack-dev-server babel-plugin-transform-decorators babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties
+yarn add --dev webpack webpack-dev-server
+yarn add --dev babel-cli babel-polyfill babel-loader babel-core
+yarn add --dev babel-preset-env babel-preset-react
+yarn add --dev babel-plugin-transform-decorators babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties
+yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
 
 #
 # Create .gitignore file
@@ -116,11 +121,11 @@ export default Api
 echo 'import React from "react"
 import github from "../clients/github"
 
-const Repo = ({ name }) => (
+export const Repo = ({ name }) => (
   <li className="repo">{name}</li>
 )
 
-class GithubRepos extends React.Component {
+export default class GithubRepos extends React.Component {
   state = { repos: [] }
 
   componentDidMount() {
@@ -142,8 +147,6 @@ class GithubRepos extends React.Component {
     )
   }
 }
-
-export default GithubRepos
 ' > app/components/GithubRepos.jsx
 
 #
@@ -169,3 +172,51 @@ echo '<html>
   </body>
 </html>
 ' > index.html
+
+#
+# Create spec.helper.js
+#
+echo '
+require("babel-register")()
+var jsdom = require("jsdom").jsdom
+var chai = require("chai")
+var sinonChai = require("sinon-chai")
+var chaiEnzyme = require("chai-enzyme")
+var exposedProperties = ["window", "navigator", "document"]
+
+chai.use(chaiEnzyme())
+chai.use(sinonChai)
+
+global.document = jsdom("")
+global.window = document.defaultView
+Object.keys(document.defaultView).forEach((property) => {
+  if (typeof global[property] === "undefined") {
+    exposedProperties.push(property)
+    global[property] = document.defaultView[property]
+  }
+})
+
+global.navigator = {
+  userAgent: "node.js"
+}
+
+documentRef = document
+' > spec/spec.helper.js
+
+#
+# Create spec example file
+#
+echo '
+import React from "react"
+import { expect } from "chai"
+import { shallow, render } from "enzyme"
+import { Repo } from "../../app/components/GithubRepos"
+
+describe("A suite", () => {
+  it("contains spec with an expectation", () => {
+    const wrapper = shallow(<Repo name="reactjs" />)
+    expect(wrapper.find("li")).to.have.className("repo")
+    expect(wrapper).to.contain("reactjs")
+  })
+})
+' > spec/components/Repo.spec.js
