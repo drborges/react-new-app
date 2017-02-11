@@ -220,3 +220,12 @@ describe("A suite", () => {
   })
 })
 ' > test/components/Repo.spec.js
+
+#
+# Create mocha.opts file
+#
+echo '
+--reporter spec
+--ui bdd
+--growl
+' > test/mocha.opts
