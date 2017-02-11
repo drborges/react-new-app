@@ -35,7 +35,7 @@ yarn add react react-dom
 yarn add --dev webpack webpack-dev-server
 yarn add --dev babel-cli babel-polyfill babel-loader babel-core
 yarn add --dev babel-preset-env babel-preset-react
-yarn add --dev babel-plugin-transform-decorators babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties
+yarn add --dev babel-plugin-transform-decorators babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
 yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
 
 #
@@ -53,6 +53,7 @@ echo '{
   "plugins": [
     "transform-decorators",
     "transform-class-properties",
+    "transform-object-rest-spread",
     "transform-es2015-computed-properties"
   ]
 }
