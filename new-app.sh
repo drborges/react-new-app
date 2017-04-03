@@ -22,7 +22,8 @@ echo '{
     "build": "./node_modules/webpack/bin/webpack.js --config webpack.config.js",
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
     "serve": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "spec": "mocha --require test/spec.helper.js test/**/*.spec.js"
+    "test": "mocha",
+    "test:watch": "mocha -w"
   }
 }
 ' > package.json
@@ -35,7 +36,7 @@ yarn add react react-dom
 yarn add --dev webpack webpack-dev-server
 yarn add --dev babel-cli babel-polyfill babel-loader babel-core
 yarn add --dev babel-preset-env babel-preset-react
-yarn add --dev babel-plugin-transform-decorators babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
+yarn add --dev babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
 yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
 
 #
@@ -51,8 +52,8 @@ npm-debug.log
 echo '{
   "presets": ["env", "react"],
   "plugins": [
-    "transform-decorators",
     "transform-class-properties",
+    "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-es2015-computed-properties"
   ]
@@ -63,6 +64,7 @@ echo '{
 # Create webpack.config.js file
 #
 echo 'module.exports = {
+  devtool: "eval-source-map",
   entry: ["babel-polyfill", "./app/index.jsx"],
   output: {
     filename: "bundle.js"
@@ -77,6 +79,11 @@ echo 'module.exports = {
   }
 }
 ' > webpack.config.js
+
+#
+# Create .nvmrc with the latest node version
+#
+echo 'v7.6.0' > .nvmrc
 
 #
 # Create .editorconfig file
@@ -226,7 +233,10 @@ describe("A suite", () => {
 # Create mocha.opts file
 #
 echo '
+--require babel-polyfill
+--require test/spec.helper.js
 --reporter spec
+--recursive
 --ui bdd
 --growl
 ' > test/mocha.opts
