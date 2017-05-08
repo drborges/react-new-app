@@ -5,14 +5,14 @@ git init
 #
 # Creates project structure
 #
-mkdir -p app/{components,clients}
-mkdir -p test/{components,clients}
+mkdir -p app/{components,api}
+mkdir -p test/{components,api}
 
 #
 # Create default package.json file
 #
 echo '{
-  "name": "lucy",
+  "name": "my-app",
   "version": "1.0.0",
   "description": "",
   "author": "",
@@ -156,13 +156,13 @@ echo 'const Api = {
 }
 
 export default Api
-' > app/clients/github.js
+' > app/api/github.js
 
 #
 # Create dummy React component
 #
 echo 'import React from "react"
-import github from "../clients/github"
+import github from "../api/github"
 
 export const Repo = ({ name }) => (
   <li className="repo">{name}</li>
