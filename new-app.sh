@@ -37,7 +37,7 @@ yarn add react react-dom webpack react-dom babel-plugin-react-css-modules
 yarn add --dev webpack-dev-server
 yarn add --dev babel-cli babel-polyfill babel-loader babel-core
 yarn add --dev babel-preset-env babel-preset-react
-yarn add --dev postcss-scss extract-text-webpack-plugin
+yarn add --dev style-loader css-loader sass-loader node-sass postcss-scss extract-text-webpack-plugin
 yarn add --dev babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
 yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
 
@@ -92,9 +92,9 @@ module.exports = {
         include: context,
         loader: ExtractTextPlugin.extract({
           use: [
-            "style?sourceMap",
-            "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]",
-            "sass?sourceMap",
+            "style-loader",
+            "css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]",
+            "sass-loader?sourceMap",
           ]
         }),
       },
