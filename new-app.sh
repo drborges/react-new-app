@@ -221,7 +221,15 @@ echo '<html>
 #
 echo '
 require("babel-register")()
-var jsdom = require("jsdom").jsdom
+var JSDOM = require("jsdom").JSDOM
+var dom = new JSDOM("", {
+  url: "https://example.org/",
+  referrer: "https://example.com/",
+  contentType: "text/html",
+  userAgent: "Mellblomenator/9000",
+  includeNodeLocations: true,
+})
+
 var chai = require("chai")
 var sinonChai = require("sinon-chai")
 var chaiEnzyme = require("chai-enzyme")
@@ -230,18 +238,8 @@ var exposedProperties = ["window", "navigator", "document"]
 chai.use(chaiEnzyme())
 chai.use(sinonChai)
 
-global.document = jsdom("")
-global.window = document.defaultView
-Object.keys(document.defaultView).forEach((property) => {
-  if (typeof global[property] === "undefined") {
-    exposedProperties.push(property)
-    global[property] = document.defaultView[property]
-  }
-})
-
-global.navigator = {
-  userAgent: "node.js"
-}
+global.window = dom.window
+global.document = dom.window.document
 
 documentRef = document
 ' > test/spec.helper.js
