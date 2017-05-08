@@ -32,10 +32,12 @@ echo '{
 # Install all required npm dependencies
 #
 brew install yarn || true
-yarn add react react-dom
-yarn add --dev webpack webpack-dev-server
+
+yarn add react react-dom webpack react-dom babel-plugin-react-css-modules
+yarn add --dev webpack-dev-server
 yarn add --dev babel-cli babel-polyfill babel-loader babel-core
 yarn add --dev babel-preset-env babel-preset-react
+yarn add --dev postcss-scss
 yarn add --dev babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
 yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
 
@@ -55,7 +57,7 @@ echo '{
     "transform-class-properties",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
-    "transform-es2015-computed-properties"
+    "transform-es2015-computed-properties",
   ]
 }
 ' > .babelrc
@@ -63,18 +65,51 @@ echo '{
 #
 # Create webpack.config.js file
 #
-echo 'module.exports = {
+echo '/* eslint-disable filenames/match-regex, import/no-commonjs */
+const path = require("path");
+const context = path.resolve(__dirname, "app");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+module.exports = {
   devtool: "eval-source-map",
-  entry: ["babel-polyfill", "./app/index.jsx"],
+  entry: [
+    "babel-polyfill",
+    "./app/index.jsx",
+  ],
   output: {
-    filename: "bundle.js"
+    filename: "bundle.js",
   },
   resolve: {
-    extensions: [".js", ".jsx"]
+    extensions: [".js", ".jsx", ".scss", ".css"],
   },
+  plugins : [
+    new ExtractTextPlugin("styles.css"),
+  ]
   module: {
     loaders: [
-      { test: /\.js|\.jsx$/, exclude: /node_modules/, loader: "babel-loader" }
+      {
+        test: /\.(s)?css$/,
+        include: context,
+        loader: ExtractTextPlugin.extract(
+          "style?sourceMap",
+          "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]",
+          "sass?sourceMap",
+        ),
+      },
+      {
+        test: /\.js|\.jsx$/,
+        exclude: /node_modules/,
+        loader: "babel-loader",
+        query: {
+          plugins: [
+            [
+              "react-css-modules", {
+                "filetypes": { ".scss": "postcss-scss" },
+              }
+            ]
+          ]
+        },
+      },
     ]
   }
 }
