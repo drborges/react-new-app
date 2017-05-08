@@ -68,7 +68,6 @@ echo '{
 echo '/* eslint-disable filenames/match-regex, import/no-commonjs */
 const path = require("path");
 const context = path.resolve(__dirname, "app");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
   devtool: "eval-source-map",
@@ -82,21 +81,16 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx", ".scss", ".css"],
   },
-  plugins : [
-    new ExtractTextPlugin("styles.css"),
-  ],
   module: {
     loaders: [
       {
         test: /\.(s)?css$/,
         include: context,
-        loader: ExtractTextPlugin.extract({
-          use: [
-            "style-loader",
-            "css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]",
-            "sass-loader?sourceMap",
-          ]
-        }),
+        loaders: [
+          "style-loader",
+          "css-loader?importLoader=1&modules&localIdentName=[path]___[name]__[local]___[hash:base64:5]",
+          "sass-loader",
+        ],
       },
       {
         test: /\.js|\.jsx$/,
