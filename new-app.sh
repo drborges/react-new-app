@@ -269,3 +269,13 @@ echo '
 --ui bdd
 --growl
 ' > test/mocha.opts
+
+#
+# Configures React Storybook inheriting the root webpack config
+#
+npm i -g @storybook/cli@3.0.0-alpha.0
+getstorybook
+
+echo '
+module.exports = require("../webpack.config.js")
+' > .storybook/webpack.config.js
