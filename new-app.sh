@@ -29,13 +29,6 @@ echo '{
 ' > package.json
 
 #
-# Create .nvmrc with the latest node version
-#
-echo 'v7.6.0' > .nvmrc
-
-nvm use
-
-#
 # Install all required npm dependencies
 #
 brew install yarn || true
