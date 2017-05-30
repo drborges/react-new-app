@@ -5,7 +5,7 @@ git init
 #
 # Creates project structure
 #
-mkdir -p app/{components,api}
+mkdir -p lib/{components,api}
 mkdir -p test/{components,api}
 
 #
@@ -17,7 +17,7 @@ echo '{
   "description": "",
   "author": "",
   "license": "MIT",
-  "main": "app/index.jsx",
+  "main": "lib/index.jsx",
   "scripts": {
     "build": "./node_modules/webpack/bin/webpack.js --config webpack.config.js",
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
@@ -27,6 +27,13 @@ echo '{
   }
 }
 ' > package.json
+
+#
+# Create .nvmrc with the latest node version
+#
+echo 'v7.6.0' > .nvmrc
+
+nvm use
 
 #
 # Install all required npm dependencies
@@ -46,6 +53,8 @@ yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai 
 #
 echo 'node_modules/
 npm-debug.log
+yarn-error.log
+bundle.js
 ' > .gitignore
 
 #
@@ -58,6 +67,15 @@ echo '{
     "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-es2015-computed-properties",
+    [
+      "react-css-modules",
+      {
+        "generateScopedName": "[path]___[name]__[local]___[hash:base64:5]",
+        "filetypes": {
+          ".scss": "postcss-scss"
+        }
+      }
+    ],
   ]
 }
 ' > .babelrc
@@ -66,14 +84,10 @@ echo '{
 # Create webpack.config.js file
 #
 echo '/* eslint-disable filenames/match-regex, import/no-commonjs */
-const path = require("path");
-const context = path.resolve(__dirname, "app");
-
 module.exports = {
   devtool: "eval-source-map",
   entry: [
     "babel-polyfill",
-    "./app/index.jsx",
   ],
   output: {
     filename: "bundle.js",
@@ -82,39 +96,25 @@ module.exports = {
     extensions: [".js", ".jsx", ".scss", ".css"],
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(s)?css$/,
-        include: context,
-        loaders: [
+        exclude: [/node_modules/],
+        use: [
           "style-loader",
           "css-loader?importLoader=1&modules&localIdentName=[path]___[name]__[local]___[hash:base64:5]",
           "sass-loader",
         ],
       },
       {
-        test: /\.js|\.jsx$/,
+        test: /\.js(x)?$/,
         exclude: /node_modules/,
-        loader: "babel-loader",
-        query: {
-          plugins: [
-            [
-              "react-css-modules", {
-                "filetypes": { ".scss": "postcss-scss" },
-              }
-            ]
-          ]
-        },
+        use: "babel-loader",
       },
     ]
   }
 }
 ' > webpack.config.js
-
-#
-# Create .nvmrc with the latest node version
-#
-echo 'v7.6.0' > .nvmrc
 
 #
 # Create .editorconfig file
@@ -152,7 +152,7 @@ echo 'const Api = {
 }
 
 export default Api
-' > app/api/github.js
+' > lib/api/github.js
 
 #
 # Create dummy React component
@@ -186,7 +186,7 @@ export default class GithubRepos extends React.Component {
     )
   }
 }
-' > app/components/GithubRepos.jsx
+' > lib/components/GithubRepos.jsx
 
 #
 # Create React code entry point
@@ -199,7 +199,7 @@ ReactDOM.render(
   <GithubRepos username="drborges" />,
   document.getElementById("app")
 )
-' > app/index.jsx
+' > lib/index.jsx
 
 #
 # Create the app's entry point index.html
@@ -247,7 +247,7 @@ echo '
 import React from "react"
 import { expect } from "chai"
 import { shallow, render } from "enzyme"
-import { Repo } from "../../app/components/GithubRepos"
+import { Repo } from "../../lib/components/GithubRepos"
 
 describe("A suite", () => {
   it("contains spec with an expectation", () => {
