@@ -37,6 +37,7 @@ yarn add react react-dom webpack react-dom babel-plugin-react-css-modules
 yarn add --dev webpack-dev-server
 yarn add --dev babel-cli babel-polyfill babel-loader babel-core
 yarn add --dev babel-preset-env babel-preset-react
+yarn add --dev cssnext postcss-import postcss-loader postcss-sass sugarss
 yarn add --dev style-loader css-loader sass-loader node-sass postcss-scss extract-text-webpack-plugin
 yarn add --dev babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties babel-plugin-transform-es2015-computed-properties babel-plugin-transform-object-rest-spread
 yarn add --dev mocha chai sinon jsdom enzyme react-addons-test-utils sinon-chai chai-enzyme
@@ -96,6 +97,7 @@ module.exports = {
         use: [
           "style-loader",
           "css-loader?importLoader=1&modules&localIdentName=[path]___[name]__[local]___[hash:base64:5]",
+          "postcss-loader",
           "sass-loader",
         ],
       },
@@ -262,6 +264,19 @@ echo '
 --ui bdd
 --growl
 ' > test/mocha.opts
+
+#
+# Configure postcss
+#
+echo 'module.exports = {
+  syntax: "postcss-scss",
+  plugins: {
+    "cssnext": {},
+    "autoprefixer": {},
+    "cssnano": {}
+  }
+}
+' > postcss.config.js
 
 #
 # Configures React Storybook inheriting the root webpack config
