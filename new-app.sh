@@ -5,8 +5,8 @@ git init
 #
 # Creates project structure
 #
-mkdir -p lib/{components,api}
-mkdir -p test/{components,api}
+mkdir -p lib/components/Card
+mkdir -p test/components
 
 #
 # Create default package.json file
@@ -131,68 +131,120 @@ trim_trailing_whitespace = false
 ' > .editorconfig
 
 #
-# Create a Github API client
-#
-echo 'const Api = {
-  user(username) {
-    return {
-      async repositories() {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`)
-        const repos = await response.json()
-        console.log(repos)
-        return repos
-      }
-    }
-  }
-}
-
-export default Api
-' > lib/api/github.js
-
-#
-# Create dummy React component
+# Create some component samples
 #
 echo 'import React from "react"
-import github from "../api/github"
 
-export const Repo = ({ name }) => (
-  <li className="repo">{name}</li>
+import "./index.scss"
+
+export const Card = ({ children, title, greedy }) => (
+  <section styleName={`card ${greedy ? "greedy" : ""}`}>
+    <section styleName="header">
+      <h1>{title}</h1>
+    </section>
+    <section styleName="body">
+      {children}
+    </section>
+  </section>
 )
 
-export default class GithubRepos extends React.Component {
-  state = { repos: [] }
+Card.defaultProps = {
+  greedy: false,
+}
 
-  componentDidMount() {
-    (async () => {
-      const repos = await github.user(this.props.username).repositories()
-      this.setState({ repos })
-    })()
+export default Card
+' > lib/components/Card/index.jsx
+
+echo '.card {
+  display: flex;
+  flex-direction: column;
+
+  margin: 5px;
+  border-radius: 3px;
+  box-shadow: 0 0 4px 0 #ddd;
+  border: thin solid #ddd;
+
+  background-color: #fff;
+
+  &.greedy {
+    flex-basis: 100%;
   }
 
-  render() {
-    const repos = this.state.repos.map((repo, i) =>
-      <Repo key={i} name={repo.name} />
-    )
+  .header {
+    margin: 0;
+    padding: 10px;
 
-    return (
-      <ul className="github-repos">
-        {repos}
-      </ul>
-    )
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .header:hover {
+    cursor: grab;
+  }
+
+  .body {
+    padding: 10px;
   }
 }
-' > lib/components/GithubRepos.jsx
+' > lib/components/Card/index.scss
+
+echo 'import React from "react"
+
+import "./index.scss"
+
+export const Dashboard = ({ children }) => (
+  <section styleName="dashboard">
+    {children}
+  </section>
+)
+
+export default Dashboard
+' > lib/components/Dashboard/index.jsx
+
+echo '.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  font-family: "Open Sans",arial,sans-serif;
+
+  & > * {
+    flex-grow: 1;
+  }
+}
+' > lib/components/Dashboard/index.scss
 
 #
 # Create React code entry point
 #
 echo 'import React from "react"
 import ReactDOM from "react-dom"
-import GithubRepos from "./components/GithubRepos"
+
+import { Dashboard, Card } from "./components"
+
+const dashboard =
+  <Dashboard>
+    <Card title="Daily Appointments">
+      <div>LOL 1</div>
+    </Card>
+    <Card title="Hourly Appointments">
+      <div>LOL 2</div>
+    </Card>
+    <Card title="Appointments Per Source" greedy>
+      <div>LOL 3</div>
+    </Card>
+    <Card title="Net Sales">
+      <div>LOL 4</div>
+    </Card>
+    <Card title="Net Volume">
+      <div>LOL 5</div>
+      <div>LOL 5</div>
+      <div>LOL 5</div>
+    </Card>
+  </Dashboard>
 
 ReactDOM.render(
-  <GithubRepos username="drborges" />,
-  document.getElementById("app")
+  dashboard,
+  document.getElementById("app"),
 )
 ' > lib/index.jsx
 
@@ -241,17 +293,16 @@ documentRef = document
 echo '
 import React from "react"
 import { expect } from "chai"
-import { shallow, render } from "enzyme"
-import { Repo } from "../../lib/components/GithubRepos"
+import { mount, render } from "enzyme"
+import { Card } from "../../lib/components"
 
 describe("A suite", () => {
   it("contains spec with an expectation", () => {
-    const wrapper = shallow(<Repo name="reactjs" />)
-    expect(wrapper.find("li")).to.have.className("repo")
-    expect(wrapper).to.contain("reactjs")
+    const wrapper = mount(<Card title="My Card" greedy />)
+    expect(wrapper.find("h1")).to.have.text("My Card")
   })
 })
-' > test/components/Repo.spec.js
+' > test/components/Card.spec.js
 
 #
 # Create mocha.opts file
@@ -287,3 +338,33 @@ getstorybook
 echo '
 module.exports = require("../webpack.config.js")
 ' > .storybook/webpack.config.js
+
+rm stories/index.js
+
+echo 'import React from "react"
+import { storiesOf } from "@storybook/react"
+import { Dashboard, Card } from "../lib/components"
+
+storiesOf("Dashboard", module)
+  .add("Empty Dashboard", () =>
+    <Dashboard>
+      <Card title="Daily Appointments">
+        <div>LOL 1</div>
+      </Card>
+      <Card title="Hourly Appointments">
+        <div>LOL 2</div>
+      </Card>
+      <Card title="Appointments Per Source" greedy>
+        <div>LOL 3</div>
+      </Card>
+      <Card title="Net Sales">
+        <div>LOL 4</div>
+      </Card>
+      <Card title="Net Volume">
+        <div>LOL 5</div>
+        <div>LOL 5</div>
+        <div>LOL 5</div>
+      </Card>
+    </Dashboard>
+  )
+' > stories/index.js
